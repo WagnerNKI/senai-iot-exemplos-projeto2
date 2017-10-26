@@ -3,6 +3,8 @@
 // precisa ser instalada pelo gerenciador de bibliotecas
 #include <Ultrasonic.h>
 
+int portaLed = 8;
+
 // Inicializa o objeto do sensor ultrasônico
 // Usando as portas 12 e 13 para trigger e echo
 Ultrasonic ultrasonic(12, 13);
@@ -21,4 +23,10 @@ void loop() {
   Serial.println(distancia);
   
   delay(1000);
+
+  if(distancia < 100){
+    digitalWrite(portaLed, HIGH);
+  }else{
+    digitalWrite(portaLed, LOW);  
+  }
 }
