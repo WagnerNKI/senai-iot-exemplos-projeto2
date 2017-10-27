@@ -12,25 +12,20 @@ LiquidCrystal lcd(rs, en, d4, d5, d6, d7);
 
 // Inicializa o objeto do sensor ultrasônico
 // Usando as portas 12 e 13 para trigger e echo
-<<<<<<< HEAD:Exemplo_Sensor_Ultrassonico/Exemplo_Sensor_Ultrassonico.ino
 Ultrasonic ultrasonic(7, 6);
 int ledRed = 13;
 int ledYellow =9;
-int buzz = 10;
-=======
-Ultrasonic ultrasonic(9, 10);
->>>>>>> bb466756012bbd0b48f3cc676d9b33e2f1e4580c:01 - Exemplo_Sensor_Ultrassonico/Exemplo_Sensor_Ultrassonico.ino
+
 
 void setup() {
   // Inicializa a porta Serial
   Serial.begin(9600);
   pinMode ( ledYellow , OUTPUT);
   pinMode ( ledRed , OUTPUT);
-  pinMode ( buzz , OUTPUT);
     // set up the LCD's number of columns and rows:
   lcd.begin(16, 2);
   // Print a message to the LCD.
-  lcd.print("hello, world!");
+  lcd.print("Distance in CM:");
 }
 
 void loop() {
@@ -44,22 +39,31 @@ void loop() {
   if (distancia <= 5){
     digitalWrite(ledRed,HIGH);
     digitalWrite(ledYellow,LOW);
-
-    
+    lcd.setCursor(5, 1);
+    lcd.print("           ");
+    lcd.setCursor(5, 1);
+    lcd.print("ooh deu!!");    
   }
   else if(distancia > 5 && distancia <= 30){
-  digitalWrite(ledYellow,HIGH);
-  digitalWrite(ledRed,LOW);
-
+    digitalWrite(ledYellow,HIGH);
+    digitalWrite(ledRed,LOW);
+    lcd.setCursor(5, 1);
+    lcd.print("           ");
+    lcd.setCursor(5, 1);
+    lcd.print("Devagar!!");
   }
  else{
-  digitalWrite(ledRed,LOW);
-  digitalWrite(ledYellow,LOW);
+    digitalWrite(ledRed,LOW);
+    digitalWrite(ledYellow,LOW);
+    lcd.setCursor(5, 1);
+    lcd.print("           ");
+    lcd.setCursor(5, 1);
+    lcd.print("Pode vir!!");
  }
    // set the cursor to column 0, line 1
   // (note: line 1 is the second row, since counting begins with 0):
   lcd.setCursor(0, 1);
-  lcd.print("                ");
+  lcd.print("    ");
   lcd.setCursor(0, 1);
   lcd.print(distancia);
   delay(500);
