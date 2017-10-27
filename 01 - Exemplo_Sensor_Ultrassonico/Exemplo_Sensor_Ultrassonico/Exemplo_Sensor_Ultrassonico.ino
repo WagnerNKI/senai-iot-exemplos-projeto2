@@ -31,11 +31,24 @@ void setup() {
 void loop() {
   // Lê o valor do sensor
   int distancia = ultrasonic.distanceRead();
-
+  String msg;
+  
   // Escreve o valor da distância no painel Serial
   Serial.print("Distance in CM: ");
   Serial.println(distancia);
 
+  if (Serial.available() > 0){
+      msg = Serial.readString();
+      Serial.print("Mensagem recebida: ");
+      Serial.print(msg);
+      Serial.println();
+      lcd.setCursor(0,1);
+      lcd.print("                   ");
+      lcd.setCursor(0,1);
+      lcd.print(msg);
+      delay(1000);
+  }
+    
   if (distancia <= 5){
     digitalWrite(ledRed,HIGH);
     digitalWrite(ledYellow,LOW);
@@ -63,7 +76,7 @@ void loop() {
    // set the cursor to column 0, line 1
   // (note: line 1 is the second row, since counting begins with 0):
   lcd.setCursor(0, 1);
-  lcd.print("    ");
+  lcd.print("     ");
   lcd.setCursor(0, 1);
   lcd.print(distancia);
   delay(500);
