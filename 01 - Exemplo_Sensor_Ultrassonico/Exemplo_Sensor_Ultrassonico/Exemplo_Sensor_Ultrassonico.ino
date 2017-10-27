@@ -12,10 +12,14 @@ LiquidCrystal lcd(rs, en, d4, d5, d6, d7);
 
 // Inicializa o objeto do sensor ultrasônico
 // Usando as portas 12 e 13 para trigger e echo
+<<<<<<< HEAD:Exemplo_Sensor_Ultrassonico/Exemplo_Sensor_Ultrassonico.ino
 Ultrasonic ultrasonic(7, 6);
 int ledRed = 13;
 int ledYellow =9;
 int buzz = 10;
+=======
+Ultrasonic ultrasonic(9, 10);
+>>>>>>> bb466756012bbd0b48f3cc676d9b33e2f1e4580c:01 - Exemplo_Sensor_Ultrassonico/Exemplo_Sensor_Ultrassonico.ino
 
 void setup() {
   // Inicializa a porta Serial
