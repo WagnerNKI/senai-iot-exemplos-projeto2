@@ -13,6 +13,10 @@
 // Usando as portas 12 e 13 para trigger e echo
 Ultrasonic ultrasonic(7, 6);
 
+int ledRed = 3;
+int ledGreen = 4;
+int ledYellow = 5;
+
 
 // Update these with values suitable for your network.
 byte mac[] = {0xDE, 0xED, 0xBA, 0xFE, 0xF1, 0x64};
@@ -51,6 +55,10 @@ boolean reconnect() {
   }
 
 void setup() {
+  pinMode (ledRed, OUTPUT);
+  pinMode (ledGreen, OUTPUT);
+  pinMode (ledYellow, OUTPUT);
+  
   // Inicializa a porta Serial
   Serial.begin(9600);
   Serial.println("Conectando...");
@@ -70,6 +78,7 @@ void setup() {
 //   
   Serial.println("Conectado MQTT");
   delay(50);
+  digitalWrite(ledYellow,HIGH);
 }
 }
 void loop() {
@@ -77,12 +86,14 @@ void loop() {
 
 if (!client.connected()) {
     long now = millis();
+    digitalWrite(ledYellow,LOW);
     if (now - lastReconnectAttempt > 5000) {
       lastReconnectAttempt = now;
       // Attempt to reconnect
       Serial.println("Reconectando...");
       if (reconnect()) {
         lastReconnectAttempt = 0;
+        digitalWrite(ledYellow,HIGH);
       }
     }
   } else {
@@ -104,8 +115,16 @@ if (!client.connected()) {
     if (now - timeParked > 3000){
       client.publish("teste","0");
       Serial.println("Vaga ocupada");
+      delay(50);
+      digitalWrite(ledRed,HIGH);
+      digitalWrite(ledGreen,LOW);
       timeParked = now;
       }
    }
+   else{
+    digitalWrite(ledGreen,HIGH);
+    digitalWrite(ledRed,LOW);
+    }
+    
   delay(1000);
 }
