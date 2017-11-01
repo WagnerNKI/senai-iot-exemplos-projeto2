@@ -17,6 +17,8 @@ int ledRed = 3;
 int ledGreen = 4;
 int ledYellow = 5;
 
+int estadoAtual = 0;
+int estadoAnterior = 0;
 
 // Update these with values suitable for your network.
 byte mac[] = {0xDE, 0xED, 0xBA, 0xFE, 0xF1, 0x64};
@@ -27,7 +29,7 @@ void callback(char* topic, byte* payload, unsigned int length);
 EthernetClient ethClient;
 
 // Dados do MQTT Cloud
-PubSubClient client("m11.cloudmqtt.com", 11084, callback, ethClient);
+PubSubClient client("m14.cloudmqtt.com", 14064, callback, ethClient);
 
 long lastReconnectAttempt = 0;
 
@@ -51,6 +53,14 @@ boolean reconnect() {
     client.subscribe("recebido");
   }
   Serial.println("Conectado MQTT");
+  digitalWrite(ledYellow,HIGH);
+//  switch (estadoAtual){
+//    case 0:
+//    client.publish("teste","0");
+//    case 1:
+//    client.publish("teste","1");
+//    }
+
   return client.connected();
   }
 
@@ -58,6 +68,7 @@ void setup() {
   pinMode (ledRed, OUTPUT);
   pinMode (ledGreen, OUTPUT);
   pinMode (ledYellow, OUTPUT);
+
   
   // Inicializa a porta Serial
   Serial.begin(9600);
@@ -66,19 +77,15 @@ void setup() {
   Ethernet.begin(mac);
 
   // Faz a conexão no cloud com nome do dispositivo, usuário e senha respectivamente
-    if (client.connect("arduino", "arduino", "ard123"))
+    if (client.connect("arduino", "arduino", "arduino"))
   {
     // Envia uma mensagem para o cloud no topic
     client.publish("teste", "v");
-        
-
-    // Conecta no topic para receber mensagens
-  client.subscribe("recebido");
   
 //   
-  Serial.println("Conectado MQTT");
-  delay(50);
-  digitalWrite(ledYellow,HIGH);
+    Serial.println("Conectado MQTT");
+    delay(50);
+    digitalWrite(ledYellow,HIGH);
 }
 }
 void loop() {
@@ -93,7 +100,7 @@ if (!client.connected()) {
       Serial.println("Reconectando...");
       if (reconnect()) {
         lastReconnectAttempt = 0;
-        digitalWrite(ledYellow,HIGH);
+        
       }
     }
   } else {
@@ -103,28 +110,30 @@ if (!client.connected()) {
   
   // Lê o valor do sensor
   int distancia = ultrasonic.distanceRead();
-  int timeParked = 0;
+//  int timeParked = 0;
   
   // Escreve o valor da distância no painel Serial
-  Serial.print("\n");
-  Serial.print("Distance in CM: ");
-  Serial.println(distancia);
+//  Serial.print("Distance in CM: ");
+//  Serial.println(distancia);
 
-  if (distancia <= 30){
-   int now = millis();
-    if (now - timeParked > 3000){
-      client.publish("teste","0");
+  
+// teste de distância + tempo de 3s para estabilizar sinal do sensor ultrasonico
+  if (distancia <= 10 && estadoAtual != estadoAnterior){
       Serial.println("Vaga ocupada");
-      delay(50);
+      client.publish("teste" , "0");
+      delay(100);
       digitalWrite(ledRed,HIGH);
       digitalWrite(ledGreen,LOW);
-      timeParked = now;
+      estadoAtual = 0;
       }
-   }
-   else{
+   
+   else if (distancia > 10 && estadoAtual == estadoAnterior){ 
+    Serial.println("Vaga desocupada");
+    client.publish("teste" , "1");
+    delay(100);
     digitalWrite(ledGreen,HIGH);
     digitalWrite(ledRed,LOW);
-    }
-    
-  delay(1000);
+    estadoAtual = 1;
+   }
+//  delay(1000);
 }
