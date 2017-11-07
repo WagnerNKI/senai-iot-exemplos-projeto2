@@ -20,6 +20,17 @@ int ledYellow = 5;
 int estadoAtual = 0;
 int estadoAnterior = 0;
 
+void feedbackmsg(){
+  digitalWrite (ledYellow, LOW);
+  delay (100);
+  digitalWrite (ledYellow, HIGH);
+  delay (100);
+  digitalWrite (ledYellow, LOW);
+  delay (100);
+  digitalWrite (ledYellow, HIGH);
+  delay (100);
+}
+
 // Update these with values suitable for your network.
 byte mac[] = {0xDE, 0xED, 0xBA, 0xFE, 0xF1, 0x64};
 
@@ -50,7 +61,7 @@ boolean reconnect() {
     // Once connected, publish an announcement...
     client.publish("teste","hello world");
     // ... and resubscribe
-    client.subscribe("recebido");
+//    client.subscribe("recebido");
   }
   Serial.println("Conectado MQTT");
   digitalWrite(ledYellow,HIGH);
@@ -77,10 +88,10 @@ void setup() {
   Ethernet.begin(mac);
 
   // Faz a conexão no cloud com nome do dispositivo, usuário e senha respectivamente
-    if (client.connect("arduino", "arduino", "arduino"))
+    if (client.connect("sensor", "sensor", "sensor"))
   {
     // Envia uma mensagem para o cloud no topic
-    client.publish("teste", "v");
+    client.publish("teste", "hello world");
   
 //   
     Serial.println("Conectado MQTT");
@@ -110,17 +121,17 @@ if (!client.connected()) {
   
   // Lê o valor do sensor
   int distancia = ultrasonic.distanceRead();
-//  int timeParked = 0;
   
-  // Escreve o valor da distância no painel Serial
-//  Serial.print("Distance in CM: ");
-//  Serial.println(distancia);
+//  Escreve o valor da distância no painel Serial
+  Serial.print("Distance in CM: ");
+  Serial.println(distancia);
 
   
-// teste de distância + tempo de 3s para estabilizar sinal do sensor ultrasonico
+// teste de distância + mandar msg MQTT
   if (distancia <= 10 && estadoAtual != estadoAnterior){
       Serial.println("Vaga ocupada");
       client.publish("teste" , "0");
+      feedbackmsg();
       delay(100);
       digitalWrite(ledRed,HIGH);
       digitalWrite(ledGreen,LOW);
@@ -130,10 +141,10 @@ if (!client.connected()) {
    else if (distancia > 10 && estadoAtual == estadoAnterior){ 
     Serial.println("Vaga desocupada");
     client.publish("teste" , "1");
+    feedbackmsg();
     delay(100);
     digitalWrite(ledGreen,HIGH);
     digitalWrite(ledRed,LOW);
     estadoAtual = 1;
    }
-//  delay(1000);
 }
