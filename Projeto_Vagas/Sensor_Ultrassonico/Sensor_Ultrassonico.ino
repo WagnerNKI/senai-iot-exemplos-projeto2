@@ -57,21 +57,14 @@ void callback(char* topic, byte* payload, unsigned int length)
 }
 
 boolean reconnect() {
-  if (client.connect("arduino", "arduino", "ard123")) {
+  if (client.connect("sensor", "sensor", "sensor")) {
     // Once connected, publish an announcement...
-    client.publish("teste","hello world");
+    client.publish("teste1","hello world");
     // ... and resubscribe
 //    client.subscribe("recebido");
   }
-  Serial.println("Conectado MQTT");
   digitalWrite(ledYellow,HIGH);
-//  switch (estadoAtual){
-//    case 0:
-//    client.publish("teste","0");
-//    case 1:
-//    client.publish("teste","1");
-//    }
-
+  Serial.println("Conectado MQTT");
   return client.connected();
   }
 
@@ -91,7 +84,7 @@ void setup() {
     if (client.connect("sensor", "sensor", "sensor"))
   {
     // Envia uma mensagem para o cloud no topic
-    client.publish("teste", "hello world");
+    client.publish("teste1", "hello world");
   
 //   
     Serial.println("Conectado MQTT");
@@ -124,13 +117,13 @@ if (!client.connected()) {
   
 //  Escreve o valor da distância no painel Serial
   Serial.print("Distance in CM: ");
-  Serial.println(distancia);
+  Serial.println(distancia);  
 
   
 // teste de distância + mandar msg MQTT
   if (distancia <= 10 && estadoAtual != estadoAnterior){
       Serial.println("Vaga ocupada");
-      client.publish("teste" , "0");
+      client.publish("teste1" , "0");
       feedbackmsg();
       delay(100);
       digitalWrite(ledRed,HIGH);
@@ -140,7 +133,7 @@ if (!client.connected()) {
    
    else if (distancia > 10 && estadoAtual == estadoAnterior){ 
     Serial.println("Vaga desocupada");
-    client.publish("teste" , "1");
+    client.publish("teste1" , "1");
     feedbackmsg();
     delay(100);
     digitalWrite(ledGreen,HIGH);
