@@ -17,8 +17,8 @@ int ledRed = 3;
 int ledGreen = 4;
 int ledYellow = 5;
 
-int estadoAtual = 0;
-int estadoAnterior = 0;
+int estadoAtual = 2;
+
 
 void feedbackmsg(){
   digitalWrite (ledYellow, LOW);
@@ -40,26 +40,25 @@ void callback(char* topic, byte* payload, unsigned int length);
 EthernetClient ethClient;
 
 // Dados do MQTT Cloud
-PubSubClient client("m14.cloudmqtt.com", 14064, callback, ethClient);
+PubSubClient client("192.168.3.186", 1883, callback, ethClient);
 
 long lastReconnectAttempt = 0;
 
 void callback(char* topic, byte* payload, unsigned int length)
 {
-  char* payloadAsChar = payload;
-  payloadAsChar[length]=0;
-  String msgRecebida = String (payloadAsChar);
-
-  Serial.println(msgRecebida);
-  Serial.println();
-  Serial.println(topic);
-  delay(100);
 }
 
-boolean reconnect() {
+boolean reconnect(int estadoAtual) {
   if (client.connect("sensor", "sensor", "sensor")) {
     // Once connected, publish an announcement...
-    client.publish("teste/1","hello world");
+    client.publish("teste","hello world");
+//    publica último estado
+    if (estadoAtual == "livre"){
+        client.publish("vagas/25" , "1", true);
+    }
+      else if (estadoAtual == "ocupado"){
+        client.publish("vagas/25" , "0", true);
+      }
     // ... and resubscribe
 //    client.subscribe("recebido");
   }
@@ -84,7 +83,7 @@ void setup() {
     if (client.connect("sensor", "sensor", "sensor"))
   {
     // Envia uma mensagem para o cloud no topic
-    client.publish("teste/1", "hello world");
+    client.publish("vagas/25", "teste");
   
     Serial.println("Conectado MQTT");
     delay(50);
@@ -101,7 +100,7 @@ if (!client.connected()) {
       lastReconnectAttempt = now;
       // Attempt to reconnect
       Serial.println("Reconectando...");
-      if (reconnect()) {
+      if (reconnect(estadoAtual)) {
         lastReconnectAttempt = 0;
         
       }
@@ -115,28 +114,32 @@ if (!client.connected()) {
   int distancia = ultrasonic.distanceRead();
   
 //  Escreve o valor da distância no painel Serial
-  Serial.print("Distance in CM: ");
-  Serial.println(distancia);  
+
 
   
 // teste de distância + mandar msg MQTT
-  if (distancia <= 10 && estadoAtual != estadoAnterior){
+// 2 é livre, 3 é ocupado
+  if (distancia <= 5 && estadoAtual == 2){
       Serial.println("Vaga ocupada");
-      client.publish("teste/1" , "0");
+      client.publish("vagas/25" , "0", true);
       feedbackmsg();
       delay(100);
       digitalWrite(ledRed,HIGH);
       digitalWrite(ledGreen,LOW);
-      estadoAtual = 0;
+      estadoAtual = 3;
+      Serial.print("Distance in CM: ");
+      Serial.println(distancia);  
       }
    
-   else if (distancia > 10 && estadoAtual == estadoAnterior){ 
+   else if (distancia > 5 && estadoAtual == 3){ 
     Serial.println("Vaga desocupada");
-    client.publish("teste/1" , "1");
+    client.publish("vagas/25" , "1", true);
     feedbackmsg();
     delay(100);
     digitalWrite(ledGreen,HIGH);
     digitalWrite(ledRed,LOW);
-    estadoAtual = 1;
+    estadoAtual = 2;
+    Serial.print("Distance in CM: ");
+    Serial.println(distancia);  
    }
 }
