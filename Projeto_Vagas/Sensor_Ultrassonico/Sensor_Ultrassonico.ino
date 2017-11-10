@@ -49,14 +49,14 @@ void callback(char* topic, byte* payload, unsigned int length)
 }
 
 boolean reconnect(int estadoAtual) {
-  if (client.connect("sensor", "sensor", "sensor")) {
+  if (client.connect("","","","vagas/25",0,true,"")) {
     // Once connected, publish an announcement...
     client.publish("teste","hello world");
 //    publica último estado
-    if (estadoAtual == "livre"){
+    if (estadoAtual == 2){
         client.publish("vagas/25" , "1", true);
     }
-      else if (estadoAtual == "ocupado"){
+      else if (estadoAtual == 3){
         client.publish("vagas/25" , "0", true);
       }
     // ... and resubscribe
@@ -80,11 +80,13 @@ void setup() {
   Ethernet.begin(mac);
 
   // Faz a conexão no cloud com nome do dispositivo, usuário e senha respectivamente
-    if (client.connect("sensor", "sensor", "sensor"))
+    if (client.connect("","","","vagas/25",0,true,""))
   {
     // Envia uma mensagem para o cloud no topic
     client.publish("vagas/25", "teste");
-  
+    client.publish("vagas/25" , "1", true);
+    estadoAtual = 2;
+    
     Serial.println("Conectado MQTT");
     delay(50);
     digitalWrite(ledYellow,HIGH);
